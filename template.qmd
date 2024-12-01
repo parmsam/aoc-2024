@@ -1,0 +1,14 @@
+---
+title: "day X"
+---
+```{python setup}
+
+```
+
+```{python p1}
+
+```
+
+```{python p2}
+
+```

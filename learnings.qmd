@@ -1,0 +1,7 @@
+--- 
+title: "Learnings"
+---
+
+- `sort()` vs `sorted()`: `sort()` sorts the list in place, while `sorted()` returns a new list
+- `zip()`: `zip()` is a built-in Python function that takes in two or more iterables (lists, tuples, etc.) and returns an iterator that generates tuples containing elements from each iterable. The iterator stops when the shortest input iterable is exhausted. They're useful in for loops and list comprehensions with unpacking.
+    - Unpacking is a way to assign the elements of an iterable to variables. For example, `a, b = (1, 2)` assigns 1 to `a` and 2 to `b`.
