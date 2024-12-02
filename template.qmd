@@ -2,7 +2,8 @@
 title: "day X"
 ---
 ```{python setup}
-
+import setup
+import aocd
 ```
 
 ```{python p1}
