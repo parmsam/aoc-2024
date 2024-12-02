@@ -5,3 +5,15 @@ title: "Learnings"
 - `sort()` vs `sorted()`: `sort()` sorts the list in place, while `sorted()` returns a new list
 - `zip()`: `zip()` is a built-in Python function that takes in two or more iterables (lists, tuples, etc.) and returns an iterator that generates tuples containing elements from each iterable. The iterator stops when the shortest input iterable is exhausted. They're useful in for loops and list comprehensions with unpacking.
     - Unpacking is a way to assign the elements of an iterable to variables. For example, `a, b = (1, 2)` assigns 1 to `a` and 2 to `b`.
+- slicing using `[:x]` and `[x:]` to get the first x elements and the elements after the first x elements, respectively 
+    - the slice syntax includes the start index but excludes the end index, so `[:2]` gets the first two elements since indexing starts at 0 in python
+    - it always return a list even if the slice is empty or just has one element
+- the `itertools` module has a `combinations()` function that returns all possible combinations of a given length from an iterable that would've made it easier to solve the second part of day 2
+```{python} 
+from itertools import combinations
+sample_list = [1, 2, 3, 4, 5]
+n = len(sample_list)
+# in that case all possible lists of length n-1
+possible_lists = combinations(sample_list, n-1)
+list(possible_lists)
+```
