@@ -17,3 +17,4 @@ n = len(sample_list)
 possible_lists = combinations(sample_list, n-1)
 list(possible_lists)
 ```
+- `re` module has `re.findall()` and `re.finditer()` functions that can be used to find all matches of a pattern in a string and return them as a list of strings or an iterator of match objects, respectively

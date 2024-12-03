@@ -1,0 +1,49 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+import aocd
+```
+
+```{python p1}
+from aocd import get_data
+data = get_data(year = 2024, day = 3)
+
+def sum_all_mul(sample):
+    pattern = r'mul\((\d+),(\d+)\)'
+    lst = [int(i[0]) * int(i[1]) for i in re.findall(pattern, sample)]
+    return sum(lst)
+# sum_all_mul(sample)
+sum_all_mul(data)
+```
+
+```{python p2}
+def get_events(text):
+    mul_matches = list(re.finditer(r'mul\((\d+),(\d+)\)', text))
+    do_matches = list(re.finditer(r'do\(\)', text))
+    dont_matches = list(re.finditer(r"don't\(\)", text))
+    
+    events = []
+    pattern = r'mul\((\d+),(\d+)\)'
+
+    mul_events = [[(match.span())] + ["mul"] + [(int(match.group(1)), int(match.group(2)))] for match in mul_matches]
+    do_events = [[(match.span())] + ["do"] + [None] for match in do_matches]
+    dont_events = [[(match.span())] + ["dont"] + [None] for match in dont_matches]
+    
+    events = mul_events + do_events + dont_events
+    return sorted(events)
+# get_events(sample)
+
+enabled = True
+numbs = []
+for i in get_events(data):
+    if i[1] == "dont":
+        enabled = False
+    elif i[1] == "do":
+        enabled = True
+    
+    if enabled and i[1] == "mul":
+        numbs.append(i[2])
+sum([i[0] * i[1] for i in numbs])
+```
