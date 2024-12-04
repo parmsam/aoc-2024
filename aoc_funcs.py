@@ -1,4 +1,4 @@
-%%writefile aoc_funcs.py
+#%%writefile aoc_funcs.py
 
 def read_aoc_input(data: str, data_type: str = 'string'):
     assert isinstance(data, str), f'Invalid data type: {type(data)}. Must be str.'

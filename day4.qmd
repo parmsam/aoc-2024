@@ -1,0 +1,105 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+import aocd
+from aocd_funcs import read_aoc_input
+```
+
+```{python p1}
+from aocd import get_data
+data = get_data(year = 2024, day = 4)
+data = read_aoc_input(data)
+
+def read_ltr_rtl(sample):
+    forwards_count = 0
+    backwards_count = 0
+    for index, row in enumerate(sample):
+        a = sum(1 for i in range(len(row)-3) if row[i:i+4] == list('XMAS'))
+        forwards_count += a
+        b = sum(1 for i in range(len(row)-3) if row[i:i+4] == list('XMAS')[::-1])
+        backwards_count += b
+    return [forwards_count, backwards_count]
+
+def get_diagonal_down_right(grid):
+    diagonals = []
+    rows, cols = len(grid), len(grid[0])    
+    # Get all diagonals starting from top row
+    # this gets the upper half triangle of the grid
+    for start_col in range(cols):
+        diagonal = []
+        for i in range(min(rows, cols - start_col)):
+            diagonal.append(grid[i][start_col + i])
+        if len(diagonal) >= 4:
+            diagonals.append(diagonal) 
+    # Get all diagonals starting from first column (excluding 0,0)
+    # this gets the lower half triangle of the grid
+    for start_row in range(1, rows):
+        diagonal = []
+        for i in range(min(rows - start_row, cols)):
+            diagonal.append(grid[start_row + i][i])
+        if len(diagonal) >= 4:
+            diagonals.append(diagonal)
+    return diagonals
+
+def get_diagonal_down_left(grid):
+    diagonals = []
+    rows, cols = len(grid), len(grid[0])
+    # Get all diagonals starting from top row
+    for start_col in range(cols-1, -1, -1):
+        diagonal = []
+        for i in range(min(rows, start_col + 1)):
+            diagonal.append(grid[i][start_col - i])
+        if len(diagonal) >= 4:
+            diagonals.append(diagonal)
+    # Get all diagonals starting from first column (excluding 0,cols-1)
+    for start_row in range(1, rows):
+        diagonal = []
+        for i in range(min(rows - start_row, cols)):
+            diagonal.append(grid[start_row + i][cols-1 - i])
+        if len(diagonal) >= 4:
+            diagonals.append(diagonal)
+    return diagonals
+
+def get_all_xmas(sample):
+    transposed_sample = list(map(list, zip(*sample)))
+    horizontal_counts = read_ltr_rtl(sample) 
+    vertical_counts = read_ltr_rtl(transposed_sample)
+    diagonal_right_counts = read_ltr_rtl(get_diagonal_down_right(sample))
+    diagonal_left_counts = read_ltr_rtl(get_diagonal_down_left(sample))
+    return [horizontal_counts, vertical_counts, diagonal_right_counts, diagonal_left_counts]
+
+sum(sum(sublist) for sublist in get_all_xmas(data))
+```
+
+```{python p2}
+def count_mas(sample):
+    def grab_a_indices(sample):
+        a_indices = []
+        nrow = len(sample)
+        ncol = len(sample[0])
+        for row_index, row in enumerate(sample):
+            for index, value in enumerate(row):
+                if value == "A":
+                    a_indices.append((row_index, index))
+        return a_indices
+    xmas_counts = []
+    nrow = len(sample)
+    ncol = len(sample[0])
+    a_indices = grab_a_indices(sample)
+    for i in a_indices:
+        row = i[0]
+        col = i[1]
+        if row > 0 and col > 0 and row < nrow - 1 and col < ncol - 1:
+            first_mas = sample[row - 1][col + 1] == "S" and sample[row + 1][col - 1] == "M" or sample[row - 1][col + 1] == "M" and sample[row + 1][col - 1] == "S"
+            second_mas = sample[row + 1][col + 1] == "S" and sample[row - 1][col - 1] == "M" or sample[row + 1][col + 1] == "M" and sample[row - 1][col - 1] == "S"
+            xmas_counts.append(
+                first_mas and second_mas
+            )
+    ans = sum(xmas_counts)
+    return ans
+# count_mas(sample)
+
+count_mas(data)
+```
