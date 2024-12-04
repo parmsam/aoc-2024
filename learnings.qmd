@@ -18,3 +18,4 @@ possible_lists = combinations(sample_list, n-1)
 list(possible_lists)
 ```
 - `re` module has `re.findall()` and `re.finditer()` functions that can be used to find all matches of a pattern in a string and return them as a list of strings or an iterator of match objects, respectively
+- `zip(*iterables)` can be used to transpose a list of lists. It does this by unpacking the elements of the list of lists and passing them as arguments to `zip()`. This is useful for getting the columns of a 2D list as rows and vice versa.
