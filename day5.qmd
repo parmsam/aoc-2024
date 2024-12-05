@@ -1,0 +1,72 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+```
+
+```{python p1}
+data = get_data(year = 2024, day = 5)
+index = data.index("")
+
+order_rules = data[:index]
+updates = data[index + 1:]
+
+order_rules = [i.split("|") for i in order_rules]
+updates = [i.split(",") for i in updates]
+
+before_lookup = [(k, v) for k,v in order_rules]
+after_lookup = [(v, k) for k,v in order_rules]
+
+def find_rules(val, rules):
+    result = [rule[1] for rule in rules if val in rule[0]]
+    if result:
+        return result
+    return None
+
+def is_valid_update(update_list, before_lookup = before_lookup, after_lookup = after_lookup):
+    for index, value in enumerate(update_list):
+        before_slice = update_list[:index]
+        after_slice = update_list[index+1:]
+        rel_after_rules = find_rules(value, before_lookup)
+        rel_before_rules = find_rules(value, after_lookup)
+        for i in before_slice:
+            if i in rel_before_rules:
+                continue
+            else:
+                return False
+        for j in after_slice:
+            if rel_after_rules is not None and j in rel_after_rules:
+                continue
+            else:
+                return False        
+    return True
+
+def find_mid_val(lst):
+    midpoint= len(lst)//2
+    return lst[midpoint]
+
+tf_lst = list(map(is_valid_update, updates))
+
+correctly_ordered = [i for tf, i in zip(tf_lst, updates) if tf == True]
+
+sum([int(find_mid_val(i)) for i in correctly_ordered])
+```
+
+```{python p2}
+incorrectly_ordered = [i for tf, i in zip(tf_lst, updates) if tf == False]
+
+def sort_update(update_list, before_lookup = before_lookup):
+    G = nx.DiGraph()
+    G.add_nodes_from(update_list)
+    for i in before_lookup:
+        if i[0] in update_list and i[1] in update_list:
+            G.add_edge(i[0], i[1])
+    return list(nx.topological_sort(G))
+
+sorted_incorrects = list(map(sort_update, incorrectly_ordered))
+
+sum([int(find_mid_val(i)) for i in sorted_incorrects])
+```

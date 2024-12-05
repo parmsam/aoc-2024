@@ -3,7 +3,8 @@ title: "day 2"
 ---
 ```{python setup}
 import setup
-import aocd
+from aocd import get_data
+from aoc_funcs import read_aoc_input
 ```
 
 The unusual data (your puzzle input) consists of many reports, one report per line. Each report is a list of numbers called levels that are separated by spaces. For example:

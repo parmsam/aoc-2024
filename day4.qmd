@@ -3,8 +3,8 @@ title: "day X"
 ---
 ```{python setup}
 import setup
-import aocd
-from aocd_funcs import read_aoc_input
+from aocd import get_data
+from aoc_funcs import read_aoc_input
 ```
 
 ```{python p1}
