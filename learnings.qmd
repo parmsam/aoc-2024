@@ -19,3 +19,11 @@ list(possible_lists)
 ```
 - `re` module has `re.findall()` and `re.finditer()` functions that can be used to find all matches of a pattern in a string and return them as a list of strings or an iterator of match objects, respectively
 - `zip(*iterables)` can be used to transpose a list of lists. It does this by unpacking the elements of the list of lists and passing them as arguments to `zip()`. This is useful for getting the columns of a 2D list as rows and vice versa.
+- `topological sorting` is a way to order the nodes in a directed acyclic graph (DAG) such that for every edge from node `u` to node `v`, `u` comes before `v` in the ordering. This is useful for tasks that have dependencies on each other, like the rules in the second part of day 7. The `networkx` library has a `topological_sort()` function that can be used to get the topological ordering of a graph. The general algorithm is as follows:
+    1. First, it finds all nodes that have no incoming edges (nothing must come before them) - these are our "starter" nodes
+    2. Then it repeatedly:
+        - Takes a starter node and adds it to the result list
+        - Removes that node and all its edges from the graph
+        - Any nodes that now have no incoming edges become new starter nodes
+    3. If there are still nodes left but no starter nodes, there's a cycle (which would be impossible to sort)
+
