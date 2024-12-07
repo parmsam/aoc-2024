@@ -1,0 +1,72 @@
+---
+title: "day 6"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+```
+
+```{python p1}
+data = get_data(year = 2024, day = 6)
+sample = read_aoc_input(data)
+
+def find_all_lol(sample, match_lst, include_match = False):
+    positions = []
+    for row_index, row in enumerate(sample):
+        for col_index, val in enumerate(row):
+            if val in match_lst:
+                if include_match:
+                    match_pos = (row_index, col_index, val)
+                else:
+                    match_pos = (row_index, col_index)
+                positions.append(match_pos)
+    return positions
+grid_info = {
+    "obstacles": find_all_lol(sample, ['#']), 
+    "start": find_all_lol(sample, ['^', '>','<','v'], True)
+}
+
+def guard_move(position, direction, sample = sample, obstacles = grid_info["obstacles"]):
+    start = [position[0], position[1]]
+    DIRECTIONS = {
+    '^': (-1, 0),   # up
+    '>': (0, 1),    # right
+    'v': (1, 0),    # down
+    '<': (0, -1)    # left
+    }
+    TURN_RIGHT = {
+    '^': '>',
+    '>': 'v',
+    'v': '<',
+    '<': '^'
+    }
+    move = DIRECTIONS[direction]
+    new_row = start[0] + move[0]
+    new_col = start[1] + move[1]
+    cur_pos = (start[0] , start[1])
+    new_pos = (new_row, new_col)
+    if new_pos in obstacles:
+        new_dir = TURN_RIGHT[direction]
+        return [cur_pos, new_dir]
+    else:
+        return([new_pos, direction,])
+
+def simulate_guard(position, direction, visited=None, sample=sample, obstacles=grid_info["obstacles"]):
+    if visited is None:
+        visited = set()
+    current_pos = position
+    current_dir = direction
+    while (0 <= current_pos[0] < len(sample) and 0 <= current_pos[1] < len(sample[0])):
+        visited.add(current_pos)
+        next_move = guard_move(current_pos, current_dir, sample, obstacles)
+        current_pos = next_move[0]
+        current_dir = next_move[1]
+    return visited
+a = simulate_guard(grid_info["start"][0][:2], grid_info["start"][0][2])
+len(a)
+```
+
+```{python p2}
+
+```

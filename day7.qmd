@@ -1,0 +1,67 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+```
+
+```{python p1}
+def eval_left_to_right(nums, operators):
+    result = int(nums[0])
+    for i in range(len(operators)):
+        if operators[i] == '+':
+            result += int(nums[i+1])
+        else:
+            result *= int(nums[i+1])
+    return result
+
+def test_combinations(nums, ref_sltn):
+    ops = ['+', '*']
+    all_operator_combinations = list(product(ops, repeat=len(nums)-1))
+    solutions = list(map(lambda x: eval_left_to_right(nums, x), all_operator_combinations))
+    x = [ref_sltn for i in solutions if i == ref_sltn]
+    return list(set(x))
+
+sample = get_data(year = 2024, day = 7)
+sample = [[j.split() for j in i.split(":")] for i in sample.splitlines()]
+
+tot = 0
+for i in sample:
+    test_val = int(i[0][0])
+    nums = [j for j in i[1]]
+    operators = ['+', '*']
+    val = sum(test_combinations(nums, test_val))
+    tot += val
+tot
+```
+
+```{python p2}
+def eval_left_to_right2(nums, operators):
+    result = int(nums[0])
+    for i in range(len(operators)):
+        if operators[i] == '+':
+            result += int(nums[i+1])
+        elif operators[i] == '*':
+            result *= int(nums[i+1])
+        elif operators[i] == '||':
+            result = int(str(result) + str(nums[i+1]))
+    return result
+
+def test_combinations2(nums, ref_sltn, operators):
+    ops = operators
+    all_operator_combinations = list(product(ops, repeat=len(nums)-1))
+    solutions = list(map(lambda x: eval_left_to_right2(nums, x), all_operator_combinations))
+    x = [ref_sltn for i in solutions if i == ref_sltn]
+    return list(set(x))
+
+tot = 0
+for i in sample:
+    test_val = int(i[0][0])
+    nums = [j for j in i[1]]
+    operators = ['+', '*', '||']
+    val = sum(test_combinations2(nums, test_val, operators))
+    tot += val
+tot
+```
