@@ -68,5 +68,29 @@ len(a)
 ```
 
 ```{python p2}
+def simulate_guard_loop(position, direction, extra_obstacle=None, sample=sample, obstacles=grid_info["obstacles"]):
+    visited_states = set()
+    
+    current_pos = position
+    current_dir = direction
+    
+    all_obstacles = set(obstacles)
+    if extra_obstacle:
+        all_obstacles.add(extra_obstacle)
+    
+    while (0 <= current_pos[0] < len(sample) and 0 <= current_pos[1] < len(sample[0])):
+        current_state = (current_pos, current_dir)
+        
+        if current_state in visited_states:
+            return True 
+        visited_states.add(current_state)
 
+        next_move = guard_move(current_pos, current_dir, sample, all_obstacles)
+        current_pos = next_move[0]
+        current_dir = next_move[1]
+    return False
+b = simulate_guard_loop(grid_info["start"][0][:2], grid_info["start"][0][2])
+
+x = [simulate_guard_loop(grid_info["start"][0][:2], grid_info["start"][0][2], extra_obstacle = i) for i in a]
+sum(x)
 ```
