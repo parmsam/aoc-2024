@@ -26,4 +26,5 @@ list(possible_lists)
         - Removes that node and all its edges from the graph
         - Any nodes that now have no incoming edges become new starter nodes
     3. If there are still nodes left but no starter nodes, there's a cycle (which would be impossible to sort)
+- default dictionaries using `collections.defaultdict` can be used to create dictionaries with default values for keys that haven't been set yet. This can be useful for counting things or grouping things by a key.
 

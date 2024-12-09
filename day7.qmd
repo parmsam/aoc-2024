@@ -5,6 +5,8 @@ title: "day X"
 import setup
 from aocd import get_data
 from aoc_funcs import read_aoc_input
+import string
+from itertools import product
 ```
 
 ```{python p1}

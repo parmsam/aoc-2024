@@ -1,0 +1,183 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+import string
+from itertools import product
+from itertools import combinations
+from collections import defaultdict
+from math import gcd
+```
+
+```{python p1-funcs}
+def find_matches(sample, match_lst, include_match = False):
+    positions = []
+    for row_index, row in enumerate(sample):
+        for col_index, val in enumerate(row):
+            if val in match_lst:
+                if include_match:
+                    match_pos = (row_index, col_index, val)
+                else:
+                    match_pos = (row_index, col_index)
+                positions.append(match_pos)
+    return positions
+
+def get_antenna_pairs(antenna_positions):
+    return list(combinations(antenna_positions, 2))
+
+def find_antinodes_for_pair(ant1, ant2):
+    row1, col1 = ant1
+    row2, col2 = ant2
+    drow = row2 - row1
+    dcol = col2 - col1
+    antinode1 = (row1 - drow, col1 - dcol)
+    antinode2 = (row2 + drow, col2 + dcol)
+    return [antinode1, antinode2]
+
+def check_antinodes(potential_positions, actual_antinodes):
+    """Check which potential positions are actual antinodes"""
+    return [pos for pos in potential_positions if pos in actual_antinodes]
+
+def process_frequency(positions):
+    """Process all antenna pairs for a single frequency"""
+    found_antinodes = set()
+    pairs = get_antenna_pairs(positions)
+    for pair in pairs:
+        potential = find_antinodes_for_pair(*pair)
+        # found = check_antinodes(potential, actual_antinodes)
+        found = potential
+        # ensure each finding is valid
+        found = [pos for pos in found if 0 <= pos[0] < len(sample) and 0 <= pos[1] < len(sample[0])]
+        found_antinodes.update(found)
+    return found_antinodes
+
+def process_all_frequencies(grouped_antennas):
+    """Process all frequencies and find all antinodes"""
+    antinodes_by_freq = {}  # Keep track of antinodes for each frequency
+    found_antinodes = set()
+    for freq, positions in grouped_antennas.items():
+        antinodes_by_freq[freq] = process_frequency(positions)
+        print(f"Frequency {freq} found {len(antinodes_by_freq[freq])} antinodes: {antinodes_by_freq[freq]}")
+    unique_antinodes = set()
+    for antinode in antinodes_by_freq.values():
+        for j in antinode:
+            unique_antinodes.add(j)
+    return unique_antinodes
+```
+
+```{python p1-sltn}
+# sample = """......#....#
+# ...#....0...
+# ....#0....#.
+# ..#....0....
+# ....0....#..
+# .#....A.....
+# ...#........
+# #......#....
+# ........A...
+# .........A..
+# ..........#.
+# ..........#."""
+sample = get_data(year=2024, day=8)
+sample = read_aoc_input(sample)
+
+antenna_chars = list(string.ascii_letters + string.digits)
+antennas = find_matches(sample, antenna_chars, True)    
+
+antennas_grouped = defaultdict(list)
+for row, col, freq in antennas:
+    antennas_grouped[freq].append((row, col))
+antennas_grouped = dict(antennas_grouped)
+
+x = process_all_frequencies(antennas_grouped)
+len(x)
+```
+
+```{python p2-funcs}
+def find_antinodes_for_pair(ant1, ant2):
+    row1, col1 = ant1
+    row2, col2 = ant2
+    points = set()
+    # Add the antenna positions themselves as they're in line
+    points.add(ant1)
+    points.add(ant2)
+    # Find all points in between and beyond that are in line
+    if col2 == col1:  # Vertical line
+        start, end = min(row1, row2), max(row1, row2)
+        for row in range(start, end + 1):
+            points.add((row, col1))
+    elif row2 == row1:  # Horizontal line
+        start, end = min(col1, col2), max(col1, col2)
+        for col in range(start, end + 1):
+            points.add((row1, col))
+    else:  # Diagonal line
+        # Calculate slope and points along the line
+        dx = col2 - col1
+        dy = row2 - row1
+        # Ensure we're using the greatest common divisor to get all points
+        g = abs(gcd(dx, dy))
+        step_x = dx // g
+        step_y = dy // g
+        # Add all points along the line
+        x, y = col1, row1
+        while min(row1, row2) <= y <= max(row1, row2):
+            points.add((y, x))
+            x += step_x
+            y += step_y
+    return list(points)
+
+def process_frequency2(positions):
+    found_antinodes = set()
+    pairs = get_antenna_pairs(positions)
+    for pair in pairs:
+        potential = find_antinodes_for_pair2(*pair, grid_height =  len(sample[0]), grid_width =  len(sample))
+        # found = check_antinodes(potential, actual_antinodes)
+        found = potential
+        # ensure each finding is valid
+        found = [pos for pos in found if 0 <= pos[0] < len(sample) and 0 <= pos[1] < len(sample[0])]
+        found_antinodes.update(found)
+    return found_antinodes
+
+def process_all_frequencies2(grouped_antennas):
+    antinodes_by_freq = {}  # Keep track of antinodes for each frequency
+    found_antinodes = set()
+    for freq, positions in grouped_antennas.items():
+        antinodes_by_freq[freq] = process_frequency2(positions)
+        print(f"Frequency {freq} found {len(antinodes_by_freq[freq])} antinodes: {antinodes_by_freq[freq]}")
+    unique_antinodes = set()
+    for antinode in antinodes_by_freq.values():
+        for j in antinode:
+            unique_antinodes.add(j)
+    return unique_antinodes
+```
+
+```{python p2-sltn}
+# sample = """##....#....#
+# .#.#....0...
+# ..#.#0....#.
+# ..##...0....
+# ....0....#..
+# .#...#A....#
+# ...#..#.....
+# #....#.#....
+# ..#.....A...
+# ....#....A..
+# .#........#.
+# ...#......##"""
+sample = get_data(year=2024, day=8)
+sample = read_aoc_input(sample)
+
+antenna_chars = list(string.ascii_letters + string.digits)
+antennas = find_matches(sample, antenna_chars, True)    
+
+antennas_grouped = defaultdict(list)
+for row, col, freq in antennas:
+    antennas_grouped[freq].append((row, col))
+antennas_grouped = dict(antennas_grouped)
+
+x = process_all_frequencies2(antennas_grouped)
+len(x)
+```
