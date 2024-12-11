@@ -1,0 +1,16 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+```
+
+```{python p1}
+
+```
+
+```{python p2}
+
+```

@@ -1,0 +1,140 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+import itertools
+```
+
+```{python p1-funs}
+def block_from_map(disk_map):
+    blocks = []
+    for index, value in enumerate(list(disk_map)):
+        if index % 2 == 0:
+            new_blocks = [str(index//2) for _ in range(0, int(value))]
+        else: 
+            new_blocks = ["." for _ in range(0, int(value))]
+        blocks.extend(new_blocks)
+    return blocks
+
+def find_first_dot(s):
+    return s.index(".")
+
+def find_last_digit(s):
+    position = len(s) - 1
+    while position >= 0:
+        if s[position].isdigit():
+            return position
+        position -= 1
+
+def check_gaps(s):
+    first_dot = s.index(".")
+    for i in range(first_dot, len(s)-1):
+        if s[i].isdigit():
+            return True
+    return False
+
+def calc_checksum(ref):
+    while check_gaps(ref):
+        a, b = find_first_dot(ref), find_last_digit(ref)
+        temp = list(ref)
+        x, y = temp[a], temp[b]
+        temp[a] = y
+        temp[b] = x
+        ref = temp
+    return sum(index * int(value) for index, value in enumerate(ref) if value != ".")
+```
+
+```{python p1-run}
+# data = "2333133121414131402"
+data = get_data(year=2024, day=9)
+blocks = block_from_map(data)
+calc_checksum(blocks)
+```
+
+```{python p2}
+def block_from_map2(disk_map):
+    blocks = []
+    for index, value in enumerate(list(disk_map)):
+        if index % 2 == 0:
+            new_blocks = [str(index//2) for _ in range(0, int(value))]
+            # convert ['15', '12', '9'] to ['1', '5', '1', '2', '9']
+            blocks.append(new_blocks)
+        else: 
+            new_spaces = ["." for _ in range(0, int(value))]
+            if new_spaces != []:
+                blocks.extend(new_spaces)
+    return blocks
+
+def find_files(blocks):
+    files = []
+    for index, sublist in enumerate(blocks):
+        if sublist and sublist[0] != '.':  # if it's a file
+            files.append({
+                'id': int(sublist[0]),
+                'position': index,
+                'size': len(sublist),
+                'content': sublist
+            })
+    return sorted(files, key=lambda x: x['id'], reverse=True)
+
+def find_spaces(blocks):
+    spaces = []
+    current_size = 0
+    start_index = 0
+    for i, sublist in enumerate(blocks):
+        if sublist and sublist[0] == '.':
+            if current_size == 0:
+                start_index = i
+            current_size += len(sublist)
+        else:
+            if current_size > 0:
+                spaces.append({
+                    'start': start_index,
+                    'size': current_size,
+                    'end': i-1
+                })
+                current_size = 0
+    # Don't forget space at the end
+    if current_size > 0:
+        spaces.append({
+            'start': start_index,
+            'size': current_size,
+            'end': len(blocks)-1
+        })
+    return spaces
+
+def flatten_ref(nested_list):
+    flat_list = list(itertools.chain.from_iterable(
+        [sublist] if not isinstance(sublist, list) else sublist for sublist in nested_list
+    ))
+    return flat_list
+
+def calc_checksum2(ref):
+    return sum(index * int(value) for index, value in enumerate(ref) if value != ".")
+# calc_checksum2(list("00992111777.44.333....5555.6666.....8888..")) == 2858
+
+def move_whole_files(blocks):
+    files = find_files(blocks)
+    for i in files:
+        spaces = find_spaces(blocks)
+        for s in spaces:
+            if s['size'] >= i['size'] and i['position'] > s['start']:
+                # switch the files
+                original = blocks[s['start']:s['start']+i['size']]
+                # perform first part of switch
+                blocks[s['start']:s['start']+i['size']] = i['content'] 
+                # perform second part of switch
+                blocks[i['position']] = ["." for _ in range(0, i['size'])]
+                break
+    return blocks
+        
+# data = "2333133121414131402"
+data = get_data(year=2024, day=9)
+blocks = block_from_map2(data)
+moved_blocks = move_whole_files(blocks)
+flattened_blocks = flatten_ref(moved_blocks)
+calc_checksum2(flattened_blocks)
+```

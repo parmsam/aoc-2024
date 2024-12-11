@@ -27,4 +27,8 @@ list(possible_lists)
         - Any nodes that now have no incoming edges become new starter nodes
     3. If there are still nodes left but no starter nodes, there's a cycle (which would be impossible to sort)
 - default dictionaries using `collections.defaultdict` can be used to create dictionaries with default values for keys that haven't been set yet. This can be useful for counting things or grouping things by a key.
+- Using `itertools.product` is useful for generating all possible combinations of operators, with the important detail that for n numbers, we need n-1 operators. It can get teh cartesian product of multiple iterables, which is useful for generating all possible combinations of operators for a given number of operands.
+    - It compares to `itertools.combination` which provides unique combinations of elements from a **single** iterable, without repetition and order-insensitive, while `iterools.product` provides the cartesian product of multiple iterables, with repetition and order-sensitive.
+- Safely flatten a list of lists into a single list without splitting inner strings using `itertools.chain.from_iterable()`.
+
 
