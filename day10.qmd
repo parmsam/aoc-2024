@@ -5,12 +5,88 @@ title: "day X"
 import setup
 from aocd import get_data
 from aoc_funcs import read_aoc_input
+import networkx as nx
 ```
 
 ```{python p1}
+def fix_sublist(string):
+    sublist = list(string)
+    for i,v in enumerate(sublist):
+        if v.isdigit():
+            sublist[i] = int(v)
+        elif v == ".":
+            sublist[i] = -1
+    return sublist
 
+def create_graph(sample):
+    G = nx.DiGraph()
+    # Add nodes
+    for row_index, _ in enumerate(sample): 
+        for col_index, value in enumerate(_):
+            if value != -1:
+                G.add_node((row_index, col_index), height = value)
+    # Add edges
+    directions = [(0,1), (0,-1), (1,0), (-1,0)]  # right, left, down, up
+    for node in G.nodes():
+        row, col = node
+        current_height = G.nodes[node]['height']
+        # Check each direction
+        for dx, dy in directions:
+            new_row, new_col = row + dx, col + dy
+            neighbor = (new_row, new_col)
+            # If neighbor exists in graph and height difference is 1
+            if neighbor in G.nodes():
+                neighbor_height = G.nodes[neighbor]['height']
+                if neighbor_height == current_height + 1:
+                    G.add_edge(node, neighbor)
+    return G
+
+def calc_score(G):
+    # For trailheads (height 0):
+    trailheads = [node for node in G.nodes() if G.nodes[node]['height'] == 0]
+    # For peaks (height 9):
+    peaks = [node for node in G.nodes() if G.nodes[node]['height'] == 9]
+    score = 0
+    for trail in trailheads:
+        reachable_peaks = 0
+        for peak in peaks:
+            if list(nx.all_simple_paths(G, trail, peak)):  
+                # if any path exists add one 
+                reachable_peaks += 1
+        print(f"Trailhead {trail} can reach {reachable_peaks} peaks")
+        score += reachable_peaks
+    return score
+
+# sample = """89010123
+# 78121874
+# 87430965
+# 96549874
+# 45678903
+# 32019012
+# 01329801
+# 10456732"""
+sample = get_data(year = 2024, day=10)
+
+sample = [fix_sublist(i) for i in sample.splitlines()]
+G = create_graph(sample)
+score = calc_score(G)
+
+print(f"Total score: {score}")
 ```
 
 ```{python p2}
-
+def calc_score2(G):
+    # For trailheads (height 0):
+    trailheads = [node for node in G.nodes() if G.nodes[node]['height'] == 0]
+    # For peaks (height 9):
+    peaks = [node for node in G.nodes() if G.nodes[node]['height'] == 9]
+    score = 0
+    for trail in trailheads:
+        for peak in peaks:
+            paths = list(nx.all_simple_paths(G, trail, peak))
+            # calculate total number of distinct hiking paths
+            score += len(paths)
+    return score
+score = calc_score2(G)
+score
 ```
