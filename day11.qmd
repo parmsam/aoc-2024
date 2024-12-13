@@ -1,0 +1,84 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+```
+
+```{python p1-funcs}
+def apply_rules(num):
+    if num == 0:
+        return 1
+    elif len(str(num)) % 2 == 0: 
+        s = str(num)
+        return int(s[:len(s)//2]), int(s[len(s)//2:])
+    else:
+        return num * 2024
+
+def blink_once(stones):
+    new_list = []
+    for i in stones:
+        x = apply_rules(i)
+        if type(x) == tuple:
+            new_list.extend(x)
+        else: 
+            new_list.append(x)
+    return new_list
+
+def run_blinks(sample, n_blinks):
+    blinks = 0
+    while blinks < n_blinks:
+        blinks += 1
+        sample = blink_once(sample)
+        print(f"After {blinks} blink: \n {sample}")
+    return len(sample)
+```
+
+```{python p1-run}
+initial_stones = get_data(day=11, year=2024)
+initial_stones = [int(x) for x in initial_stones.split()]
+# Run for 25 blinks
+result = run_blinks(initial_stones, 25)
+print(f"\nFinal number of stones: {result}")
+```
+
+```{python p2}
+from collections import defaultdict
+
+def apply_rules(num):
+    if num == 0:
+        return 1
+    elif len(str(num)) % 2 == 0: 
+        s = str(num)
+        return int(s[:len(s)//2]), int(s[len(s)//2:])
+    else:
+        return num * 2024
+
+# Convert initial list to dictionary with stone numbers as keys and counts as values
+def blink_once2(stones_dict):
+    new_stones = defaultdict(int)
+    for num, count in stones_dict.items():
+        result = apply_rules(num)
+        if isinstance(result, tuple):
+            new_stones[result[0]] += count
+            new_stones[result[1]] += count
+        else:
+            new_stones[result] += count
+    return dict(new_stones)
+
+def run_blinks2(sample, n_blinks):
+    blinks = 0
+    while blinks < n_blinks:
+        blinks += 1
+        sample = blink_once2(sample)
+        print(f"After {blinks} blink: \n {sample}")
+    return sum(sample.values())
+# initial_stones = {125: 1, 17: 1}  # example input
+initial_stones = get_data(day=11, year=2024)
+initial_stones = {int(x): 1 for x in initial_stones.split()}
+# Run for 75 blinks
+result = run_blinks2(initial_stones, 75)
+print(f"\nFinal number of stones: {result}")
+```
