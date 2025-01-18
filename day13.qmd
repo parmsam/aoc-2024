@@ -1,0 +1,105 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+import numpy as np
+import re
+import itertools
+from math import gcd
+```
+
+```{python p1}
+def solve_machine(c):
+    A = np.array([[c[0], c[2]], [c[1], c[3]]])
+    b = np.array([c[4], c[5]])
+    try:
+        solution = list(np.linalg.solve(A, b))
+        solution = np.round(solution)  # Round to handle floating point
+        int_solution = list(map(int, solution))
+        if np.array_equal(np.dot(A, int_solution),b):
+            # print(f"A = {A}, b = {b}")
+            return [int_solution[0] * 3, int_solution[1]]
+    except:
+        pass
+    return []
+
+def solve_puzzle(input_text):
+    # Parse input
+    machines = input_text.strip().split('\n\n')
+    configs = [list(map(int, re.findall(r"\d+", m))) for m in machines]
+
+    # Solve all machines
+    solutions = list(map(solve_machine, configs))
+    all_tokens = list(itertools.chain(*solutions))
+    
+    return sum(all_tokens)
+data = """Button A: X+94, Y+34
+Button B: X+22, Y+67
+Prize: X=8400, Y=5400
+
+Button A: X+26, Y+66
+Button B: X+67, Y+21
+Prize: X=12748, Y=12176
+
+Button A: X+17, Y+86
+Button B: X+84, Y+37
+Prize: X=7870, Y=6450
+
+Button A: X+69, Y+23
+Button B: X+27, Y+71
+Prize: X=18641, Y=10279"""
+data = get_data(year=2024, day=13)
+result = solve_puzzle(data)
+result
+```
+
+
+```{python p2}
+def solve_machine(c):
+    A = np.array([[c[0], c[2]], [c[1], c[3]]])
+    b = np.array([c[4], c[5]])
+    try:
+        solution = list(np.linalg.solve(A, b))
+        solution = np.round(solution)  # Round to handle floating point
+        int_solution = list(map(int, solution))
+        if np.array_equal(np.dot(A, int_solution),b):
+            # print(f"A = {A}, b = {b}")
+            return [int_solution[0] * 3, int_solution[1]]
+    except:
+        pass
+    return []
+
+def solve_puzzle(input_text):
+    # Parse input
+    machines = input_text.strip().split('\n\n')
+    configs = [list(map(int, re.findall(r"\d+", m))) for m in machines]
+    for c in configs:
+            c[4] += 10000000000000  # X coordinate
+            c[5] += 10000000000000  # Y coordinate
+    # Solve all machines
+    solutions = list(map(solve_machine, configs))
+    all_tokens = list(itertools.chain(*solutions))
+    return sum(all_tokens)
+
+data = """Button A: X+94, Y+34
+Button B: X+22, Y+67
+Prize: X=8400, Y=5400
+
+Button A: X+26, Y+66
+Button B: X+67, Y+21
+Prize: X=12748, Y=12176
+
+Button A: X+17, Y+86
+Button B: X+84, Y+37
+Prize: X=7870, Y=6450
+
+Button A: X+69, Y+23
+Button B: X+27, Y+71
+Prize: X=18641, Y=10279"""
+data = get_data(year=2024, day=13)
+result = solve_puzzle(data)
+result
+```

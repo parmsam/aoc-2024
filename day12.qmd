@@ -1,0 +1,157 @@
+---
+title: "day X"
+---
+```{python setup}
+import setup
+from aocd import get_data
+from aoc_funcs import read_aoc_input
+import numpy as np
+import networkx as nx
+```
+
+```{python p1}
+def create_grid_from_input(input_text):
+    """Convert input text to grid"""
+    return [list(line) for line in input_text.strip().splitlines()]
+
+def build_graph(grid):
+    """Create NetworkX graph from grid"""
+    G = nx.Graph()
+    for row_index, row in enumerate(grid):
+        for col_index, value in enumerate(row):
+            G.add_node((row_index, col_index), letter=value)
+    
+    directions = [(0,1), (0,-1), (1,0), (-1,0)]
+    for node in G.nodes():
+        row, col = node
+        current_value = G.nodes[node]['letter']
+        for dx, dy in directions:
+            neighbor = (row + dx, col + dy)
+            if neighbor in G.nodes() and G.nodes[neighbor]['letter'] == current_value:
+                G.add_edge(node, neighbor)
+    return G
+
+def calculate_price(nodes):
+    """Calculate area * perimeter for a set of nodes"""
+    area = len(nodes)
+    def calc_perimeter(ref):
+        from_pt = np.array(ref[0])
+        sides_contributed = 0
+        for i in ref:
+            free_sides = 4
+            for j in ref:
+                if i != j:
+                    if np.sum(np.abs(np.array(i) - np.array(j))) == 1:
+                        free_sides -= 1
+            sides_contributed += free_sides
+        return sides_contributed
+    return area * calc_perimeter(nodes)
+
+def solve_garden(input_text):
+    """Calculate total price for all regions"""
+    grid = create_grid_from_input(input_text)
+    G = build_graph(grid)
+    total = 0
+    # For each letter type
+    for letter in set(nx.get_node_attributes(G, 'letter').values()):
+        # Create subgraph of just this letter's nodes
+        letter_nodes = [node for node in G.nodes() if G.nodes[node]['letter'] == letter]
+        subgraph = G.subgraph(letter_nodes)  
+        # Find connected components (separate regions) for this letter
+        for region in nx.connected_components(subgraph):
+            price = calculate_price(list(region))
+            # print(f"{letter} region: {price}")
+            total += price       
+    return total
+
+sample = """RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE"""
+
+sample = get_data(year=2024, day=12)
+result = solve_garden(sample)
+print(f"Total price: {result}")
+```
+
+```{python p2}
+def count_region_sides(nodes):
+    """Count distinct sides in a region"""
+    # Sort nodes into rows and columns
+    rows = {}
+    cols = {}
+    for row, col in nodes:
+        if row not in rows:
+            rows[row] = []
+        if col not in cols:
+            cols[col] = []
+        rows[row].append(col)
+        cols[col].append(row)
+    
+    sides = 0
+    # Count vertical sides
+    processed_cols = set()
+    for row in sorted(rows):
+        cols_in_row = sorted(rows[row])
+        # Left edge
+        if cols_in_row[0] not in processed_cols:
+            sides += 1
+            processed_cols.add(cols_in_row[0])
+        # Right edge
+        if cols_in_row[-1] not in processed_cols:
+            sides += 1
+            processed_cols.add(cols_in_row[-1])
+    # Count horizontal sides
+    processed_rows = set()
+    for col in sorted(cols):
+        rows_in_col = sorted(cols[col])
+        # Top edge
+        if rows_in_col[0] not in processed_rows:
+            sides += 1
+            processed_rows.add(rows_in_col[0])
+        # Bottom edge
+        if rows_in_col[-1] not in processed_rows:
+            sides += 1
+            processed_rows.add(rows_in_col[-1])
+    return sides
+
+def calculate_price(nodes):
+    """Calculate area * number of sides"""
+    area = len(nodes)
+    sides = count_region_sides(nodes)
+    return area * sides
+
+def solve_garden(input_text):
+    """Calculate total price for all regions"""
+    grid = create_grid_from_input(input_text)
+    grid_shape = (len(grid), len(grid[0]))
+    G = build_graph(grid)
+    total = 0
+    # For each letter type
+    for letter in set(nx.get_node_attributes(G, 'letter').values()):
+        # Create subgraph of just this letter's nodes
+        letter_nodes = [node for node in G.nodes() if G.nodes[node]['letter'] == letter]
+        subgraph = G.subgraph(letter_nodes)  
+        # Find connected components (separate regions) for this letter
+        for region in nx.connected_components(subgraph):
+            price = calculate_price(list(region))
+            # print(f"{letter} region: {price}")
+            total += price       
+    return total
+
+sample = """EEEEE
+EXXXX
+EEEEE
+EXXXX
+EEEEE"""
+
+# sample = get_data(year=2024, day=12)
+result = solve_garden(sample)
+print(f"Total price: {result}")
+```
